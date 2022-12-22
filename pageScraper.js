@@ -1,3 +1,5 @@
+let browser;
+
 const scraperObject = {
 	async scraper(browser, url) {
 		let page = await browser.newPage();
