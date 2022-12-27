@@ -5,12 +5,18 @@ const s3Client = require('./s3Client');
 const fs = require('fs');
 const util = require('util');
 const Stream = require('stream');
+const { parse } = require('csv-parse');
+const  { createGzip } = require('zlib');
+const csvWriteStream  = require('csv-write-stream');
+
 // const Readable = require("stream");
 
 const { Db } = require('mongodb');
 const file = fs.createWriteStream('output-file-1.txt');
 
-let counter = 30;
+let counter = 25;
+
+const outStream = createGzip();
 
 async function scrapeAll(browserInstance) {
     let result = '';
@@ -35,9 +41,8 @@ async function scrapeAll(browserInstance) {
                 cb(null, chunk);
             }
         }))
-        // .pipe(convertToCSV())
-        // .pipe(compress())
-        .pipe(outputStream);
+        .pipe(csvWriteStream({ separator: ';', enclose: true }))
+        .pipe(outStream);
 
     // readableStream.on('data', (e) => console.log(e))
 
@@ -179,11 +184,11 @@ async function scrapeAll(browserInstance) {
     }
 
     readableStream.push(null);
- 
+
     await s3Client.upload({
         Key: options.awsS3OutputKey,
         Bucket: options.awsS3OutputBucket,
-        Body: outputStream
+        Body: outStream
     }).promise()
 
     await browser.close();
