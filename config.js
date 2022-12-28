@@ -56,7 +56,7 @@ const cliArguments = [
         name: 'num-workers',
         type: Number,
         description: 'Number of concurrent processes that will run the export',
-        defaultValue: 1,
+        defaultValue: 4,
     },
     {
         name: 'worker-index',
