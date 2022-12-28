@@ -110,7 +110,7 @@ function parseOptions(rawOptions) {
     awsS3InputBucket = partsInput[1];
     awsS3InputKey = partsInput[2];
 
-    const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(awsS3OutputFilePath);
+    const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv\.gz)$/.exec(awsS3OutputFilePath);
     assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
     awsS3OutputBucket = partsOutput[1];
     awsS3OutputKey = partsOutput[2];

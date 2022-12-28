@@ -12,15 +12,12 @@ async function scrapeAll(browserInstance) {
     const writeStream = csvWriteStream({ separator: ',', enclose: true });
     const outStream = new Stream.PassThrough();
 
-
     try {
         writeStream
             .pipe(createGzip())
             .pipe(outStream);
-
-
+            
         const urls = await getInputData(options);
-        // console.log(urls);
         number_of_urls = urls.length;
         let browser = await browserInstance;
         for (i = counter; i <= 31; i++) {
@@ -28,7 +25,6 @@ async function scrapeAll(browserInstance) {
                 try {
                     let newPage = await browser.newPage();
                     await newPage.setDefaultNavigationTimeout(0);
-                    // await newPage.goto(urls[i]);
                     console.log('navigation to the current search_page  : ', urls[i]);
 
                     await newPage.goto(urls[i]);
