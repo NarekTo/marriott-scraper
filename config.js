@@ -79,7 +79,7 @@ function parseOptions(rawOptions) {
     let awsS3InputBucket;
     let awsS3InputKey;
     let awsS3OutputBucket;
-    let awsS3OutputKey;
+    let awsS3OutputKey = [];
     let awsS3Region = rawOptions['aws-s3-region'];
     let awsS3InputFilePath = rawOptions['aws-s3-input-path'];
     let awsS3OutputFilePath = rawOptions['aws-s3-output-file-path'];
@@ -111,13 +111,28 @@ function parseOptions(rawOptions) {
     awsS3InputKey = partsInput[2];
 
     const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv\.gz)$/.exec(awsS3OutputFilePath);
+
     assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
     awsS3OutputBucket = partsOutput[1];
-    awsS3OutputKey = partsOutput[2];
-
     console.log('awsS3OutputBucket', awsS3OutputBucket);
-    console.log('awsS3OutputKey', awsS3OutputKey);
+    // console.log('awsS3OutputKey', awsS3OutputKey);
 
+    // export function getS3OutputFilename(config: BSCExportOptions , prefix: string, postfix: string) {
+    //     const padLength = (config.numWorkers - 1).toString().length;
+    //     return config.numWorkers > 1
+    //     ? `${prefix}-${config.workerIndex.toString().padStart(padLength, '0')}${postfix}`
+    //     : `${prefix}${postfix}`;
+    //   }
+
+    // if (numWorkers > 1) {
+    //     for (i = 1; i <= numWorkers; i++) {
+    //         // awsS3OutputKey[i] = partsOutput[2].worker-{i}.csv.gz;
+    //         awsS3OutputKey = `${partsOutput[2]}.worker-${ workerIndex }.csv.gz`
+    //     }
+    // }
+    awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${ workerIndex }.csv.gz` : null;
+
+    console.log('awsS3OutputKey', awsS3OutputKey);
 
     const options = {
         awsS3AccessKey,

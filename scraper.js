@@ -5,7 +5,8 @@ const Stream = require('stream');
 const { createGzip } = require('zlib');
 const csvWriteStream = require('csv-write-stream');
 
-let counter = 25;
+let counter = 0;
+
 
 async function scrapeAll(browserInstance) {
 
@@ -16,11 +17,11 @@ async function scrapeAll(browserInstance) {
         writeStream
             .pipe(createGzip())
             .pipe(outStream);
-            
+
         const urls = await getInputData(options);
         number_of_urls = urls.length;
         let browser = await browserInstance;
-        for (i = counter; i <= 31; i++) {
+        for (i = counter; i <= number_of_urls/options.numWorkers; i++) {
             {
                 try {
                     let newPage = await browser.newPage();
@@ -126,7 +127,6 @@ async function scrapeAll(browserInstance) {
                     else {
                         total_amount = 'no total amount'
                     }
-
 
                     const result =
                     {

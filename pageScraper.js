@@ -32,17 +32,6 @@ const scraperObject = {
 				await newPage.close();
 			});
 
-
-			// let urls = csvToJson.getJsonFromCsv("marriott-input-url.csv");
-
-
-			// for(link in urls){
-			// let currentPageData = await pagePromise(urls[link]);
-			// scrapedData.push(currentPageData);
-			// // console.log(currentPageData);
-			// }
-
-
 			let currentPageData = await pagePromise(url);
 			scrapedData.push(currentPageData);
 
