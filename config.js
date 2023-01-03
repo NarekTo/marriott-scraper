@@ -117,22 +117,10 @@ function parseOptions(rawOptions) {
     console.log('awsS3OutputBucket', awsS3OutputBucket);
     // console.log('awsS3OutputKey', awsS3OutputKey);
 
-    // export function getS3OutputFilename(config: BSCExportOptions , prefix: string, postfix: string) {
-    //     const padLength = (config.numWorkers - 1).toString().length;
-    //     return config.numWorkers > 1
-    //     ? `${prefix}-${config.workerIndex.toString().padStart(padLength, '0')}${postfix}`
-    //     : `${prefix}${postfix}`;
-    //   }
-
-    // if (numWorkers > 1) {
-    //     for (i = 1; i <= numWorkers; i++) {
-    //         // awsS3OutputKey[i] = partsOutput[2].worker-{i}.csv.gz;
-    //         awsS3OutputKey = `${partsOutput[2]}.worker-${ workerIndex }.csv.gz`
-    //     }
-    // }
-    awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${ workerIndex }.csv.gz` : null;
-
-    console.log('awsS3OutputKey', awsS3OutputKey);
+    function getS3OutputFilename(workerIndex) {
+    return numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null
+    }
+    let i = workerIndex + 1;
 
     const options = {
         awsS3AccessKey,
@@ -141,14 +129,15 @@ function parseOptions(rawOptions) {
         awsS3InputBucket,
         awsS3InputKey,
         awsS3OutputBucket,
-        awsS3OutputKey,
+        // awsS3OutputKey,
         awsS3InputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePathFormat,
         numWorkers,
         workerIndex,
-        awsS3Endpoint
+        awsS3Endpoint,
+        getS3OutputFilename
     }
     console.log('these are the options', options);
     return options;
