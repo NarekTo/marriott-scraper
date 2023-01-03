@@ -117,10 +117,13 @@ function parseOptions(rawOptions) {
     console.log('awsS3OutputBucket', awsS3OutputBucket);
     // console.log('awsS3OutputKey', awsS3OutputKey);
 
-    function getS3OutputFilename(workerIndex) {
-    return numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null
-    }
-    let i = workerIndex + 1;
+    // function getS3OutputFilename(workerIndex) {
+    // return numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null
+    // }
+    // let i = workerIndex + 1;
+    awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${ workerIndex}.csv.gz` : null;
+
+    console.log('awsS3OutputKey', awsS3OutputKey);
 
     const options = {
         awsS3AccessKey,
@@ -129,7 +132,7 @@ function parseOptions(rawOptions) {
         awsS3InputBucket,
         awsS3InputKey,
         awsS3OutputBucket,
-        // awsS3OutputKey,
+        awsS3OutputKey,
         awsS3InputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePath,
@@ -137,7 +140,6 @@ function parseOptions(rawOptions) {
         numWorkers,
         workerIndex,
         awsS3Endpoint,
-        getS3OutputFilename
     }
     console.log('these are the options', options);
     return options;
