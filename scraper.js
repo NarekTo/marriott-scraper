@@ -12,7 +12,8 @@ async function scrapeAll(browserInstance) {
     const outStream = new Stream.PassThrough();
     const urls = await getInputData(options);
 
-    let number_of_urls = urls.length;
+    console.log('workerindex urls are : ', urls);
+
     let browser;
 
     try {
@@ -22,7 +23,7 @@ async function scrapeAll(browserInstance) {
 
         browser = await browserInstance;
 
-        for (i = counter; i <= number_of_urls; i++) {
+        for (i = counter; i <= urls.length; i++) {
 
             try {
                 let newPage = await browser.newPage();
