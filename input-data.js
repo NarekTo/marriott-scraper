@@ -14,18 +14,16 @@ async function getInputData(options) {
     const workerIndex = options.workerIndex;
     const allUrls = csvContent.Body.toString().split('\n').map(e => e.trim());
 
+    const equalChunks = (arr, n) => {
+        const size = Math.ceil(arr.length / n);
+        return Array.from({ length: n }, (v, i) =>
+            arr.slice(i * size, i * size + size)
+        );
+    }
 
-    function sliceIntoChunks(arr, chunkSize) {
-        const res = [];
-        for (let i = 0; i < arr.length; i += chunkSize) {
-            const chunk = arr.slice(i, i + chunkSize);
-            res.push(chunk);
-        }
-        return res;
-    }    
-
-    chunkUrls = sliceIntoChunks(allUrls, numWorkers)
-    return chunkUrls[workerIndex];
+    const result = equalChunks(allUrls, options.numWorkers);
+    console.log('chunks are : ', result)
+    return result[workerIndex];
 }
 
 module.exports = getInputData;
