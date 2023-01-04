@@ -1,8 +1,6 @@
 const AWS = require('aws-sdk');
 const s3Client = require('./s3Client');
 const options = require('./config');
-const createGzip = require('zlib');
-// const { numWorkers } = require('./config');
 
 async function getInputData(options) {
     const csvContent = await s3Client.getObject({
@@ -14,10 +12,10 @@ async function getInputData(options) {
     const workerIndex = options.workerIndex;
     const allUrls = csvContent.Body.toString().split('\n').map(e => e.trim());
 
-    const equalChunks = (arr, n) => {
-        const size = Math.ceil(arr.length / n);
-        return Array.from({ length: n }, (v, i) =>
-            arr.slice(i * size, i * size + size)
+    const equalChunks = (inputUrls, numberChunks) => {
+        const size = Math.ceil(inputUrls.length / numberChunks);
+        return Array.from({ length: numberChunks }, (v, i) =>
+        inputUrls.slice(i * size, i * size + size)
         );
     }
 
