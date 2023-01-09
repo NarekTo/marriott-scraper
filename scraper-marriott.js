@@ -14,7 +14,19 @@ const requestDataPaths = {
     total_amount_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(5)'
 }
 
-// let counter = 0;
+
+async function getScreenshots(newPage, screenshotNumber) {
+    screenshot = await newPage.screenshot({
+        path: 'screenshot-' + screenshotNumber + '.png',
+        fullPage: true
+    });
+
+    await s3Client.upload({
+        Key: options.awsS3OutputScreenshotsKey + '/screenshot-' + screenshotNumber + '.png',
+        Bucket: options.awsS3OutputScreenshotsBucket,
+        Body: screenshot
+    }).promise()
+}
 
 async function getData(browser, urls, writeStream) {
     for (i = 0; i <= urls.length; i++) {
@@ -28,35 +40,31 @@ async function getData(browser, urls, writeStream) {
 
             let dataObj = {};
             await newPage.$('#__next');
-            // let path = 'screenshot-' + i + '.png';
 
-            screenshot = await newPage.screenshot({
-                path: 'screenshot-' + i + '.png',
-                fullPage: true
-            });
+            // calling the function to get the the screenshot for 
+            // the current listing and uload it on minio
 
-            await s3Client.upload({
-                Key: options.awsS3OutputScreenshotsKey + '/screenshot-' + i + '.png',
-                Bucket: options.awsS3OutputScreenshotsBucket,
-                Body: screenshot
-            }).promise()       
+            await getScreenshots(newPage, i);
 
             console.log('the results are ...');
             dataObj['URL'] = await newPage.url();
 
-            check_in_date = await newPage.$(requestDataPaths.check_in_date) !== null ? await newPage.$eval(requestDataPaths.check_in_date, text => text.textContent) :  "no check_in_date";
-            check_out_date = await newPage.$(requestDataPaths.check_out_date) !== null ? await newPage.$eval(requestDataPaths.check_out_date, text => text.textContent) :  "no check_out_date";
-            price_per_night = await newPage.$(requestDataPaths.price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths.price_per_night_brut, text => text.textContent) :  "no price_per_night_brut";
-            security_deposit_brut_not_sliced = await newPage.$(requestDataPaths.security_deposit_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.security_deposit_brut_not_sliced, text => text.textContent) :  "no security_deposit_brut_not_sliced";
-            security_deposit_brut = security_deposit_brut_not_sliced.slice(0, 5);                
-            cleaning_fee_brut_not_sliced = await newPage.$(requestDataPaths.cleaning_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.cleaning_fee_brut_not_sliced, text => text.textContent) :  "no cleaning_fee_brut_not_sliced";
+            check_in_date = await newPage.$(requestDataPaths.check_in_date) !== null ? await newPage.$eval(requestDataPaths.check_in_date, text => text.textContent) : "no check_in_date";
+            check_out_date = await newPage.$(requestDataPaths.check_out_date) !== null ? await newPage.$eval(requestDataPaths.check_out_date, text => text.textContent) : "no check_out_date";
+            price_per_night = await newPage.$(requestDataPaths.price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths.price_per_night_brut, text => text.textContent) : "no price_per_night_brut";
+            security_deposit_brut_not_sliced = await newPage.$(requestDataPaths.security_deposit_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.security_deposit_brut_not_sliced, text => text.textContent) : "no security_deposit_brut_not_sliced";
+            security_deposit_brut = security_deposit_brut_not_sliced.slice(0, 5);
+            cleaning_fee_brut_not_sliced = await newPage.$(requestDataPaths.cleaning_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.cleaning_fee_brut_not_sliced, text => text.textContent) : "no cleaning_fee_brut_not_sliced";
             cleaning_fee_brut = cleaning_fee_brut_not_sliced.slice(0, 5);
-            taxes_fee_brut_not_sliced = await newPage.$(requestDataPaths.taxes_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.taxes_fee_brut_not_sliced, text => text.textContent) :  "no taxes_fee_brut_not_sliced";
+            taxes_fee_brut_not_sliced = await newPage.$(requestDataPaths.taxes_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.taxes_fee_brut_not_sliced, text => text.textContent) : "no taxes_fee_brut_not_sliced";
             taxes_fee_brut = cleaning_fee_brut_not_sliced.slice(0, 5);
-            total_amount_brut_not_sliced = await newPage.$(requestDataPaths.total_amount_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.total_amount_brut_not_sliced, text => text.textContent) :  "no total_amount_brut_not_sliced";
+            total_amount_brut_not_sliced = await newPage.$(requestDataPaths.total_amount_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths.total_amount_brut_not_sliced, text => text.textContent) : "no total_amount_brut_not_sliced";
             total_amount_brut = total_amount_brut_not_sliced.slice(0, 5);
 
-            // security deposit identification -------------------------------------------------------------------------------------------
+            // checking different configurations to get the correct data
+            // whenever there are deposit fee or not 
+
+            // 1) security deposit identification -------------------------------------------------------------------------------------------
 
             if (security_deposit_brut == 'Secur') {
                 security_deposit = dataObj['security_deposit_brut']
@@ -73,7 +81,7 @@ async function getData(browser, urls, writeStream) {
             else {
                 security_deposit = 'no security deposit'
             }
-            // cleaning fee identification -------------------------------------------------------------------------------------------
+            // 2) cleaning fee identification -------------------------------------------------------------------------------------------
 
             if (cleaning_fee_brut == 'Clean') {
                 cleaning_fee = dataObj['cleaning_fee_brut']
@@ -87,7 +95,7 @@ async function getData(browser, urls, writeStream) {
             else {
                 cleaning_fee = 'no cleaning fee'
             }
-            // taxes fee identification -------------------------------------------------------------------------------------------
+            // 3) taxes fee identification -------------------------------------------------------------------------------------------
 
             if (taxes_fee_brut == 'Taxes') {
                 taxes_fee = dataObj['taxes_fee_brut']
@@ -99,7 +107,7 @@ async function getData(browser, urls, writeStream) {
                 taxes_fee = 'no taxes fee'
             }
 
-            // total amount identification -------------------------------------------------------------------------------------------
+            // 4) total amount identification -------------------------------------------------------------------------------------------
 
             if (total_amount_brut == 'Total') {
                 total_amount = dataObj['total_amount_brut']
@@ -111,7 +119,6 @@ async function getData(browser, urls, writeStream) {
             const result =
             {
                 outputFile: options.awsS3OutputKey,
-                // counter: counter,
                 search_URL: `${dataObj['URL']}`,
                 check_in_date: check_in_date,
                 check_out_date: check_out_date,
@@ -145,7 +152,7 @@ async function scrapeAll(browserInstance) {
             .pipe(outStream);
         browser = await browserInstance;
 
-        await getData(browser, urls, writeStream); 
+        await getData(browser, urls, writeStream);
 
         console.log('ending');
         writeStream.end();
