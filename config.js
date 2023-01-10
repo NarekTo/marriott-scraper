@@ -3,7 +3,6 @@ const moment = require('moment');
 const AWS = require('aws-sdk');
 const assert = require('assert');
 
-
 config.env.load();
 
 const cliArguments = [
@@ -47,6 +46,16 @@ const cliArguments = [
         description: '(optional) Full S3 URI of the .csv.gz file where the file will be written',
     },
     {
+        name: 'aws-s3-output-screenshots-path',
+        type: String,
+        description: 'folder where the screenshots will be uploaded while scraping the listings',
+    },
+    {
+        name: 'aws-s3-output-screenshots-bucket',
+        type: String,
+        description: '(optional) Full S3 URI of the screenshots where the file will be written',
+    },
+    {
         name: 'aws-s3-output-bucket',
         type: String,
         description: '(optional) Full S3 URI of the .csv.gz file where the file will be written',
@@ -56,7 +65,7 @@ const cliArguments = [
         name: 'num-workers',
         type: Number,
         description: 'Number of concurrent processes that will run the export',
-        defaultValue: 1,
+        defaultValue: 4,
     },
     {
         name: 'worker-index',
@@ -79,15 +88,19 @@ function parseOptions(rawOptions) {
     let awsS3InputBucket;
     let awsS3InputKey;
     let awsS3OutputBucket;
-    let awsS3OutputKey;
+    let awsS3OutputKey = [];
+    let awsS3OutputScreenshotsBucket;
+    let awsS3OutputScreenshotsKey = [];
     let awsS3Region = rawOptions['aws-s3-region'];
     let awsS3InputFilePath = rawOptions['aws-s3-input-path'];
     let awsS3OutputFilePath = rawOptions['aws-s3-output-file-path'];
     let awsS3OutputFilePathFormat = rawOptions['aws-s3-output-path-file-format'];
+    let awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
     let numWorkers = rawOptions['num-workers'];
     let workerIndex = rawOptions['worker-index'];
     let awsS3Endpoint = rawOptions['aws-s3-endpoint'];
 
+    console.log('awsS3OutputScreenshotsPath ======', awsS3OutputScreenshotsPath);
 
     assert(rawOptions['aws-s3-access-key'], '--aws-s3-access-key is required');
     assert(rawOptions['aws-s3-secret-key'], '--aws-s3-secret-key is required');
@@ -110,14 +123,22 @@ function parseOptions(rawOptions) {
     awsS3InputBucket = partsInput[1];
     awsS3InputKey = partsInput[2];
 
-    const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(awsS3OutputFilePath);
+    const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv\.gz)$/.exec(awsS3OutputFilePath);
+
     assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
     awsS3OutputBucket = partsOutput[1];
-    awsS3OutputKey = partsOutput[2];
-
     console.log('awsS3OutputBucket', awsS3OutputBucket);
-    console.log('awsS3OutputKey', awsS3OutputKey);
+    awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
 
+    const partsOutputScreenshots = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+)/.exec(awsS3OutputScreenshotsPath);
+    // assert(partsOutputScreenshots && partsOutputScreenshots.length === 3, '--aws-s3-output-path should be a valid folder');
+    console.log('partsOutputScreenshots ======', partsOutputScreenshots);
+
+    awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
+    console.log('awsS3OutputBucket', awsS3OutputScreenshotsBucket);
+    awsS3OutputScreenshotsKey = partsOutputScreenshots[2];
+
+    console.log('awsS3OutputKey', awsS3OutputScreenshotsKey);
 
     const options = {
         awsS3AccessKey,
@@ -127,13 +148,15 @@ function parseOptions(rawOptions) {
         awsS3InputKey,
         awsS3OutputBucket,
         awsS3OutputKey,
+        awsS3OutputScreenshotsBucket,
+        awsS3OutputScreenshotsKey,
         awsS3InputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePathFormat,
         numWorkers,
         workerIndex,
-        awsS3Endpoint
+        awsS3Endpoint,
     }
     console.log('these are the options', options);
     return options;
