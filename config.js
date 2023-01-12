@@ -100,8 +100,6 @@ function parseOptions(rawOptions) {
     let workerIndex = rawOptions['worker-index'];
     let awsS3Endpoint = rawOptions['aws-s3-endpoint'];
 
-    console.log('awsS3OutputScreenshotsPath ======', awsS3OutputScreenshotsPath);
-
     assert(rawOptions['aws-s3-access-key'], '--aws-s3-access-key is required');
     assert(rawOptions['aws-s3-secret-key'], '--aws-s3-secret-key is required');
 
@@ -131,14 +129,13 @@ function parseOptions(rawOptions) {
     awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
 
     const partsOutputScreenshots = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+)/.exec(awsS3OutputScreenshotsPath);
-    // assert(partsOutputScreenshots && partsOutputScreenshots.length === 3, '--aws-s3-output-path should be a valid folder');
-    console.log('partsOutputScreenshots ======', partsOutputScreenshots);
+    // console.log('partsOutputScreenshots ======', partsOutputScreenshots);
 
     awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
-    console.log('awsS3OutputBucket', awsS3OutputScreenshotsBucket);
+    // console.log('awsS3OutputBucket', awsS3OutputScreenshotsBucket);
     awsS3OutputScreenshotsKey = partsOutputScreenshots[2];
 
-    console.log('awsS3OutputKey', awsS3OutputScreenshotsKey);
+    // console.log('awsS3OutputKey', awsS3OutputScreenshotsKey);
 
     const options = {
         awsS3AccessKey,
