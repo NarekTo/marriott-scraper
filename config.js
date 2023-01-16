@@ -82,22 +82,22 @@ const rawOptions = config.env.getArguments(cliArguments, process.argv, {
 });
 
 function parseOptions(rawOptions) {
-    let awsS3AccessKey = rawOptions['aws-s3-access-key'];
-    let awsS3SecretKey = rawOptions['aws-s3-secret-key'];
-    let awsS3InputBucket;
-    let awsS3InputKey;
-    let awsS3OutputBucket;
+    const awsS3AccessKey = rawOptions['aws-s3-access-key'];
+    const awsS3SecretKey = rawOptions['aws-s3-secret-key'];
+    let awsS3InputBucket = [];
+    let awsS3InputKey = '';
+    let awsS3OutputBucket = [];
     let awsS3OutputKey = [];
-    let awsS3OutputScreenshotsBucket;
+    let awsS3OutputScreenshotsBucket = [];
     let awsS3OutputScreenshotsKey = [];
     let awsS3Region = rawOptions['aws-s3-region'];
     let awsS3InputFilePath = rawOptions['aws-s3-input-path'];
-    let awsS3OutputFilePath = rawOptions['aws-s3-output-file-path'];
-    let awsS3OutputFilePathFormat = rawOptions['aws-s3-output-path-file-format'];
-    let awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
-    let numWorkers = rawOptions['num-workers'];
-    let workerIndex = rawOptions['worker-index'];
-    let awsS3Endpoint = rawOptions['aws-s3-endpoint'];
+    let awsS3OutputFilePath = [];
+    const awsS3OutputFilePathFormat = rawOptions['aws-s3-output-path-file-format'];
+    const awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
+    const numWorkers = rawOptions['num-workers'];
+    const workerIndex = rawOptions['worker-index'];
+    const awsS3Endpoint = rawOptions['aws-s3-endpoint'];
 
     assert(rawOptions['aws-s3-access-key'], '--aws-s3-access-key is required');
     assert(rawOptions['aws-s3-secret-key'], '--aws-s3-secret-key is required');
@@ -116,7 +116,7 @@ function parseOptions(rawOptions) {
     assert(rawOptions['aws-s3-input-path'], 'aws-s3-input-path should be set');
 
     const partsInput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(rawOptions['aws-s3-input-path']);
-    
+
     assert(partsInput && partsInput.length === 3, '--aws-s3-input-path should be a valid S3 location for a .csv file');
     awsS3InputBucket = partsInput[1];
     awsS3InputKey = partsInput[2];

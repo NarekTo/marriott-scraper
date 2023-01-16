@@ -15,7 +15,7 @@ const requestDataPaths = {
     _total_amount_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(5)'
 }
 
-async function getScreenshots(newPage, screenshotNumber) {
+async function uploadScreenshot(newPage, screenshotNumber) {
     screenshot = await newPage.screenshot({
         fullPage: true
     });
@@ -34,7 +34,7 @@ async function getData(browser, urls, writeStream) {
             await newPage.goto(urls[chunckCounter]);
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
-            await getScreenshots(newPage, chunckCounter);
+            await uploadScreenshot(newPage, chunckCounter);
 
             const listingURL = await newPage.url();
             const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
