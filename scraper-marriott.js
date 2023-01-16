@@ -19,7 +19,6 @@ async function getScreenshots(newPage, screenshotNumber) {
     screenshot = await newPage.screenshot({
         fullPage: true
     });
-
     await s3Client.upload({
         Key: options.awsS3OutputScreenshotsKey + '/screenshot-' + screenshotNumber + '-of-worker-number-' + options.workerIndex + '.png',
         Bucket: options.awsS3OutputScreenshotsBucket,
@@ -28,15 +27,14 @@ async function getScreenshots(newPage, screenshotNumber) {
 }
 
 async function getData(browser, urls, writeStream) {
-    for (i = 0; i < urls.length; i++) {
+    for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
             const newPage = await browser.newPage();
             await newPage.setDefaultNavigationTimeout(0);
-            await newPage.goto(urls[i]);
+            await newPage.goto(urls[chunckCounter]);
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
-
-            await getScreenshots(newPage, i);
+            await getScreenshots(newPage, chunckCounter);
 
             const listingURL = await newPage.url();
             const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
@@ -51,8 +49,7 @@ async function getData(browser, urls, writeStream) {
             const total_amount_brut_not_sliced = await newPage.$(requestDataPaths._total_amount_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths._total_amount_brut_not_sliced, text => text.textContent) : "no total_amount_brut_not_sliced";
             const total_amount_brut = total_amount_brut_not_sliced.slice(0, 5);
 
-            // checking different configurations to get the correct data
-            // whenever there are deposit fee or not 
+            // checking different configurations to get the correct data whenever there are deposit fee or not 
 
             // 1) security deposit identification -------------------------------------------------------------------------------------------
 
@@ -72,7 +69,6 @@ async function getData(browser, urls, writeStream) {
                 security_deposit = 'no security deposit'
             }
             // 2) cleaning fee identification -------------------------------------------------------------------------------------------
-
             if (cleaning_fee_brut == 'Clean') {
                 cleaning_fee = cleaning_fee_brut
             }
@@ -86,7 +82,6 @@ async function getData(browser, urls, writeStream) {
                 cleaning_fee = 'no cleaning fee'
             }
             // 3) taxes fee identification -------------------------------------------------------------------------------------------
-
             if (taxes_fee_brut == 'Taxes') {
                 taxes_fee = taxes_fee_brut
             }
@@ -96,7 +91,6 @@ async function getData(browser, urls, writeStream) {
             else {
                 taxes_fee = 'no taxes fee'
             }
-
             // 4) total amount identification -------------------------------------------------------------------------------------------
 
             if (total_amount_brut == 'Total') {
@@ -117,7 +111,6 @@ async function getData(browser, urls, writeStream) {
                 taxes_fee: taxes_fee,
                 total_amount: total_amount,
             };
-            console.log('pushing result', result)
             writeStream.write(result)
             await newPage.close();
         }
@@ -133,15 +126,13 @@ async function scrapeAll(browserInstance) {
     const urlsList = await getInputData(options);
     const writeStream = csvWriteStream({ separator: ',', enclose: true });
     let browser;
+
     try {
         browser = await browserInstance;
-
         writeStream
             .pipe(createGzip())
             .pipe(outStream);
-
         await getData(browser, urlsList, writeStream);
-
         writeStream.end();
 
         await s3Client.upload({

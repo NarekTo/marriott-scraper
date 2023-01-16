@@ -16,13 +16,9 @@ async function getInputData(options) {
         Bucket: options.awsS3InputBucket,
         Key: options.awsS3InputKey,
     }).promise();
-
     const allUrls = csvContent.Body.toString().split('\n').map(e => e.trim());
-
     const result = getInputChunks(allUrls, options.numWorkers);
 
-    console.log('chunks are : ', result)
     return result[options.workerIndex];
 }
-
 module.exports = getInputData;

@@ -60,7 +60,6 @@ const cliArguments = [
         type: String,
         description: '(optional) Full S3 URI of the .csv.gz file where the file will be written',
     },
-
     {
         name: 'num-workers',
         type: Number,
@@ -117,6 +116,7 @@ function parseOptions(rawOptions) {
     assert(rawOptions['aws-s3-input-path'], 'aws-s3-input-path should be set');
 
     const partsInput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(rawOptions['aws-s3-input-path']);
+    
     assert(partsInput && partsInput.length === 3, '--aws-s3-input-path should be a valid S3 location for a .csv file');
     awsS3InputBucket = partsInput[1];
     awsS3InputKey = partsInput[2];
@@ -125,17 +125,11 @@ function parseOptions(rawOptions) {
 
     assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
     awsS3OutputBucket = partsOutput[1];
-    console.log('awsS3OutputBucket', awsS3OutputBucket);
     awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
 
     const partsOutputScreenshots = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+)/.exec(awsS3OutputScreenshotsPath);
-    // console.log('partsOutputScreenshots ======', partsOutputScreenshots);
-
     awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
-    // console.log('awsS3OutputBucket', awsS3OutputScreenshotsBucket);
     awsS3OutputScreenshotsKey = partsOutputScreenshots[2];
-
-    // console.log('awsS3OutputKey', awsS3OutputScreenshotsKey);
 
     const options = {
         awsS3AccessKey,
@@ -155,7 +149,6 @@ function parseOptions(rawOptions) {
         workerIndex,
         awsS3Endpoint,
     }
-    console.log('these are the options', options);
     return options;
 }
 module.exports = parseOptions(rawOptions);
