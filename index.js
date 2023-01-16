@@ -3,7 +3,7 @@ const browserObject = require('./browser');
 
 scraper(browserObject.startBrowser())
     .then(() => {
-        console.log('[OK]');
+        console.log('[all listings from this worker are correctly scraped]');
         process.exit(0);
     })
     .catch((err) => {

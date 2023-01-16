@@ -101,6 +101,7 @@ async function getData(browser, urls, writeStream) {
             }
             const result =
             {
+                listingNumber: 'listing-' + options.chunckCounter + '-worker-index-' + options.workerIndex,
                 outputFile: options.awsS3OutputKey,
                 listingURL: listingURL,
                 check_in_date: check_in_date,
@@ -118,6 +119,7 @@ async function getData(browser, urls, writeStream) {
             console.error(error);
             throw error
         }
+        console.log('the listing number ' + chunckCounter + ' from workerIndex ' + options.workerIndex + ' is correctly scraped' )
     }
 }
 
