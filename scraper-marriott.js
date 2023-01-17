@@ -9,10 +9,10 @@ const requestDataPaths = {
     _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',
     _check_out_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div> div > div> div > div > div > div:nth-child(4)> span > div:nth-child(2)',
     _price_per_night_brut: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(1)',
-    _security_deposit_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(2)',
-    _cleaning_fee_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(3)',
-    _taxes_fee_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(4)',
-    _total_amount_brut_not_sliced: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(5)'
+    _security_deposit_brut: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(2)',
+    _cleaning_fee_brut: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(3)',
+    _taxes_fee_brut: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(4)',
+    _total_amount_brut: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div:nth-child(1)> div:nth-child(1) > div:nth-child(2)>div>div>div:nth-child(5)'
 }
 
 async function uploadScreenshot(newPage, screenshotNumber) {
@@ -39,78 +39,92 @@ async function getData(browser, urls, writeStream) {
             const listingURL = await newPage.url();
             const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
             const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "no check_out_date";
-            const price_per_night = await newPage.$(requestDataPaths._price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths._price_per_night_brut, text => text.textContent) : "no price_per_night_brut";
-            const security_deposit_brut_not_sliced = await newPage.$(requestDataPaths._security_deposit_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths._security_deposit_brut_not_sliced, text => text.textContent) : "no security_deposit_brut_not_sliced";
-            const security_deposit_brut = security_deposit_brut_not_sliced.slice(0, 5);
-            const cleaning_fee_brut_not_sliced = await newPage.$(requestDataPaths._cleaning_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee_brut_not_sliced, text => text.textContent) : "no cleaning_fee_brut_not_sliced";
-            const cleaning_fee_brut = cleaning_fee_brut_not_sliced.slice(0, 5);
-            const taxes_fee_brut_not_sliced = await newPage.$(requestDataPaths._taxes_fee_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths._taxes_fee_brut_not_sliced, text => text.textContent) : "no taxes_fee_brut_not_sliced";
-            const taxes_fee_brut = taxes_fee_brut_not_sliced.slice(0, 5);
-            const total_amount_brut_not_sliced = await newPage.$(requestDataPaths._total_amount_brut_not_sliced) !== null ? await newPage.$eval(requestDataPaths._total_amount_brut_not_sliced, text => text.textContent) : "no total_amount_brut_not_sliced";
-            const total_amount_brut = total_amount_brut_not_sliced.slice(0, 5);
+            const price_per_night_brut = await newPage.$(requestDataPaths._price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths._price_per_night_brut, text => text.textContent) : "no price_per_night_brut";
+            const security_deposit_brut = await newPage.$(requestDataPaths._security_deposit_brut) !== null ? await newPage.$eval(requestDataPaths._security_deposit_brut, text => text.textContent) : "no security_deposit_brut"; 
+            const cleaning_fee_brut = await newPage.$(requestDataPaths._cleaning_fee_brut) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee_brut, text => text.textContent) : "no cleaning_fee_brut";
+            const taxes_fee_brut = await newPage.$(requestDataPaths._taxes_fee_brut) !== null ? await newPage.$eval(requestDataPaths._taxes_fee_brut, text => text.textContent) : "no taxes_fee_brut";
+            const total_amount_brut = await newPage.$(requestDataPaths._total_amount_brut) !== null ? await newPage.$eval(requestDataPaths._total_amount_brut, text => text.textContent) : "no total_amount_brut";
 
             // checking different configurations to get the correct data whenever there are deposit fee or not 
-
             // 1) security deposit identification -------------------------------------------------------------------------------------------
 
-            if (security_deposit_brut == 'Secur') {
-                security_deposit = security_deposit_brut
+            if (security_deposit_brut.slice(0, 5) == 'Secur') {
+                security_deposit = security_deposit_brut.slice(26, )
             }
-            else if (cleaning_fee_brut == 'Secur') {
-                security_deposit = cleaning_fee_brut
+            else if (cleaning_fee_brut.slice(0, 5) == 'Secur') {
+                security_deposit = cleaning_fee_brut.slice(12,)
             }
-            else if (taxes_fee_brut == 'Secur') {
-                taxes_fee = taxes_fee_brut
+            else if (taxes_fee_brut.slice(0,5) == 'Secur') {
+                security_deposit = taxes_fee_brut.slice(5,)
             }
-            else if (total_amount_brut == 'Secur') {
-                total_amount = total_amount_brut
+            else if (total_amount_brut.slice(0,5) == 'Secur') {
+                security_deposit = total_amount_brut.slice(5,)
             }
             else {
                 security_deposit = 'no security deposit'
             }
             // 2) cleaning fee identification -------------------------------------------------------------------------------------------
-            if (cleaning_fee_brut == 'Clean') {
-                cleaning_fee = cleaning_fee_brut
+            if (security_deposit_brut.slice(0,5) == 'Clean') {
+                cleaning_fee = security_deposit_brut.slice(12,)
             }
-            else if (taxes_fee_brut == 'Clean') {
-                cleaning_fee = taxes_fee_brut
+            else if (cleaning_fee_brut.slice(0,5) == 'Clean') {
+                cleaning_fee = cleaning_fee_brut.slice(12,)
             }
-            else if (total_amount_brut == 'Clean') {
-                cleaning_fee = total_amount_brut
+            else if (taxes_fee_brut.slice(0,5) == 'Clean') {
+                cleaning_fee = taxes_fee_brut.slice(12,)
+            }
+            else if (total_amount_brut.slice(0,5) == 'Clean') {
+                cleaning_fee = total_amount_brut.slice(12,)
             }
             else {
                 cleaning_fee = 'no cleaning fee'
             }
             // 3) taxes fee identification -------------------------------------------------------------------------------------------
-            if (taxes_fee_brut == 'Taxes') {
-                taxes_fee = taxes_fee_brut
+            if (security_deposit_brut.slice(0,5) == 'Taxes') {
+                taxes_fee = security_deposit_brut.slice(5,)
             }
-            else if (total_amount_brut == 'Taxes') {
-                taxes_fee = total_amount_brut
+            else if (cleaning_fee_brut.slice(0,5) == 'Taxes') {
+                taxes_fee = cleaning_fee_brut.slice(5,)
+            }
+            else if (taxes_fee_brut.slice(0,5) == 'Taxes') {
+                taxes_fee = taxes_fee_brut.slice(5,)
+            }
+            else if (total_amount_brut.slice(0,5) == 'Taxes') {
+                taxes_fee = total_amount_brut.slice(5,)
             }
             else {
                 taxes_fee = 'no taxes fee'
             }
             // 4) total amount identification -------------------------------------------------------------------------------------------
-
-            if (total_amount_brut == 'Total') {
-                total_amount = total_amount_brut
+            if (security_deposit_brut.slice(0,5) == 'Total') {
+                total_amount = security_deposit_brut.slice(5,)
+            }
+            else if (cleaning_fee_brut.slice(0,5) == 'Total') {
+                total_amount = cleaning_fee_brut.slice(5,)
+            }
+            else if (taxes_fee_brut.slice(0,5) == 'Total') {
+                total_amount = taxes_fee_brut.slice(5,)
+            }
+            else if (total_amount_brut.slice(0,5) == 'Total') {
+                total_amount = total_amount_brut.slice(5,)
             }
             else {
                 total_amount = 'no total amount'
             }
+
             const result =
             {
-                listingNumber: 'listing-' + options.chunckCounter + '-worker-index-' + options.workerIndex,
+                listingNumber: 'listing-' + chunckCounter + '-worker-index-' + options.workerIndex,
                 outputFile: options.awsS3OutputKey,
                 listingURL: listingURL,
                 check_in_date: check_in_date,
                 check_out_date: check_out_date,
-                price_per_night: price_per_night,
-                security_deposit: security_deposit,
-                cleaning_fee: cleaning_fee,
-                taxes_fee: taxes_fee,
-                total_amount: total_amount,
+                price_per_night: price_per_night_brut.split(' ')[0],
+                security_deposit: security_deposit.split(' ')[0],
+                cleaning_fee: cleaning_fee.split(' ')[0],
+                taxes_fee: taxes_fee.split(' ')[0],
+                total_amount: total_amount.split(' ')[0],
+                currency : total_amount.split(' ')[1] 
             };
             writeStream.write(result)
             await newPage.close();
