@@ -5,6 +5,9 @@ const Stream = require('stream');
 const { createGzip } = require('zlib');
 const csvWriteStream = require('csv-write-stream');
 
+console.log("the scraper file is opening......");
+
+
 const requestDataPaths = {
     _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',
     _check_out_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div> div > div> div > div > div > div:nth-child(4)> span > div:nth-child(2)',
@@ -44,6 +47,7 @@ async function getData(browser, urls, writeStream) {
             const cleaning_fee_brut = await newPage.$(requestDataPaths._cleaning_fee_brut) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee_brut, text => text.textContent) : "no cleaning_fee_brut";
             const taxes_fee_brut = await newPage.$(requestDataPaths._taxes_fee_brut) !== null ? await newPage.$eval(requestDataPaths._taxes_fee_brut, text => text.textContent) : "no taxes_fee_brut";
             const total_amount_brut = await newPage.$(requestDataPaths._total_amount_brut) !== null ? await newPage.$eval(requestDataPaths._total_amount_brut, text => text.textContent) : "no total_amount_brut";
+            console.log("the total_amount_brut ......", total_amount_brut);
 
             // checking different configurations to get the correct data whenever there are deposit fee or not 
             // 1) security deposit identification -------------------------------------------------------------------------------------------
@@ -126,6 +130,7 @@ async function getData(browser, urls, writeStream) {
                 total_amount: total_amount.split(' ')[0],
                 currency : total_amount.split(' ')[1] 
             };
+            console.log("the result scraper ......", result);
             writeStream.write(result)
             await newPage.close();
         }
@@ -145,17 +150,22 @@ async function scrapeAll(browserInstance) {
 
     try {
         browser = await browserInstance;
-        writeStream
-            .pipe(createGzip())
-            .pipe(outStream);
-        await getData(browser, urlsList, writeStream);
-        writeStream.end();
 
-        await s3Client.upload({
+        const upload = s3Client.upload({
             Key: options.awsS3OutputKey,
             Bucket: options.awsS3OutputBucket,
             Body: outStream
         }).promise()
+
+        writeStream
+            .pipe(createGzip())
+            .pipe(outStream);
+
+        await getData(browser, urlsList, writeStream);
+        writeStream.end();
+
+        await upload;
+
     }
     catch (error) {
         console.error(error);

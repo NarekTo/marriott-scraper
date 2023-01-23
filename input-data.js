@@ -18,6 +18,10 @@ async function getInputData(options) {
     }).promise();
     const allUrls = csvContent.Body.toString().split('\n').map(e => e.trim());
     const result = getInputChunks(allUrls, options.numWorkers);
+    console.log("the input data file is opening......");
+    console.log("the input data file and its results......", result);
+
     return result[options.workerIndex];
+
 }
 module.exports = getInputData;

@@ -82,17 +82,18 @@ const rawOptions = config.env.getArguments(cliArguments, process.argv, {
 });
 
 function parseOptions(rawOptions) {
+    console.log('reading the input, the rawoptions', rawOptions)
     const awsS3AccessKey = rawOptions['aws-s3-access-key'];
     const awsS3SecretKey = rawOptions['aws-s3-secret-key'];
-    let awsS3InputBucket = [];
+    let awsS3InputBucket = '';
     let awsS3InputKey = '';
-    let awsS3OutputBucket = [];
-    let awsS3OutputKey = [];
-    let awsS3OutputScreenshotsBucket = [];
-    let awsS3OutputScreenshotsKey = [];
-    let awsS3Region = rawOptions['aws-s3-region'];
-    let awsS3InputFilePath = rawOptions['aws-s3-input-path'];
-    let awsS3OutputFilePath = [];
+    let awsS3OutputBucket = '';
+    let awsS3OutputKey = '';
+    let awsS3OutputScreenshotsBucket = '';
+    let awsS3OutputScreenshotsKey = '';
+    const awsS3Region = rawOptions['aws-s3-region'];
+    const awsS3InputFilePath = rawOptions['aws-s3-input-path'];
+    let awsS3OutputFilePath = '';
     const awsS3OutputFilePathFormat = rawOptions['aws-s3-output-path-file-format'];
     const awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
     const numWorkers = rawOptions['num-workers'];
