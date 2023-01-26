@@ -82,7 +82,6 @@ const rawOptions = config.env.getArguments(cliArguments, process.argv, {
 });
 
 function parseOptions(rawOptions) {
-    console.log('reading the input, the rawoptions', rawOptions)
     const awsS3AccessKey = rawOptions['aws-s3-access-key'];
     const awsS3SecretKey = rawOptions['aws-s3-secret-key'];
     let awsS3InputBucket = '';
