@@ -1,67 +1,35 @@
-# # FROM ghcr.io/puppeteer/puppeteer:18.2.1
-# FROM node:lts-alpine
-# RUN apk add --update --no-cache  --virtual build-dependencie \
-#     chromium \
-#     mesa \
-#     nss \
-#     freetype \
-#     harfbuzz \
-#     ca-certificates \
-#     bash \
-#     ttf-freefont \
-#     desktop-file-utils \
-#         adwaita-icon-theme \
-#         ttf-dejavu \
-#         ffmpeg-libs \
-#         # The following package is used to send key presses to the X process.
-#         xdotool \
-#         build-base 
+# FROM ghcr.io/puppeteer/puppeteer:18.2.1
+FROM node:lts-alpine
+RUN apk add --update --no-cache  --virtual build-dependencie \
+    chromium \
+    mesa \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    bash \
+    ttf-freefont \
+    desktop-file-utils \
+        adwaita-icon-theme \
+        ttf-dejavu \
+        ffmpeg-libs \
+        xdotool \
+        build-base 
 
-# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-#     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-# ARG NPM_TOKEN
-# ENTRYPOINT ["bash", "/app/entrypoint.sh"]
-# # ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ARG NPM_TOKEN
+ENTRYPOINT ["bash", "/app/entrypoint.sh"]
 
-# ENV LANG en_US.UTF-8
-# ENV LANGUAGE en_US:en
-# ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 
-# WORKDIR /app
+WORKDIR /app
 
-# COPY . /app
-# RUN set -ex \
-#     && mv .npmrc.docker .npmrc \
-#     && npm ci \
-#     && npm cache verify \
-#     && rm -rf ~/.npmrc ~/.ssh 
-
-# # RUN npm install chromium puppeteer --unsafe-perm=true --allow-root
-# # RUN npm install
-
-
-FROM node:18
-
-RUN apt-get update
-
-# RUN apt-get install -yyq ca-certificates
-
-RUN apt-get install -yyq libappindicator1 libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6
-
-RUN apt-get install -yyq gconf-service lsb-release wget xdg-utils
-
-RUN apt-get install -yyq fonts-liberation 
-
-# RUN npm install aws-sdk
-
-WORKDIR /usr/src/app
-
-COPY package.json ./
-
-# RUN npm install
-
-COPY . .
-
-# EXPOSE 5000
-# CMD [ "node", "server.js" ]
-CMD [ "npm", "start" ]
+COPY . /app
+RUN set -ex \
+    && mv .npmrc.docker .npmrc \
+    && npm ci \
+    && npm cache verify \
+    && rm -rf ~/.npmrc ~/.ssh \
