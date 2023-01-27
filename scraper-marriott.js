@@ -5,8 +5,6 @@ const Stream = require('stream');
 const { createGzip } = require('zlib');
 const csvWriteStream = require('csv-write-stream');
 
-console.log("scraper-marriott file is opening......");
-
 const requestDataPaths = {
     _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',
     _check_out_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div> div > div> div > div > div > div:nth-child(4)> span > div:nth-child(2)',
