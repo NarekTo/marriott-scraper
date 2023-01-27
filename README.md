@@ -1,31 +1,37 @@
-. Marriott luxury homes rateshops scraper from https://homes-and-villas.marriott.com/ platform
+## Marriott luxury homes rateshops scraper from https://homes-and-villas.marriott.com/  platform
 
 
-This module is automatically and dynamically getting the input inting urls from MINIO server, which was previously uploaded to MINIO with a CSV format file.
-Then by scraping the rateshops and registring the screenshot from each listing, it is storing in the MINIO server as a CSV file for the metrics and png images for the screenshots.
+This module is automatically and dynamically receiving input listing urls from the `minio` server, which has been previously uploaded to the `minio` server as a `csv` file.
 
-As the puppeteer library is hardly configurable and not always compatible with different OS versions (especially with MAC OS), for this reason there is not any docker and kubernetes configurations in this repo, thus we will configure the bastion deployment. 
+Then by scraping the rateshops and registring the screenshot of each listing, it is storing in the `minio` server as a `csv` file : `csv` for the metrics and `png` for the screenshots images.
 
-. Characteristics
+As the `puppeteer` library is hardly configurable and not always compatible with different OS versions (especially with MAC OS), there is no docker and kubernetes configurations, thus the deployment happens on the bastion servers. 
 
-scraping rateshops by using streams, which lets us to make run the application with service workers
-for a number of worker 4 the application can be run with 4 different worker indexes, thus creating 4 different CSV output files and parallelly store the screenshots in 4 defferent folders : each output file and output folder named according to the worker index 
+## Characteristics
 
-running application, usage example by this command: 
+Scraping rateshops by using service workers in order to run the module in parallely for several chuncks of input URLs. 
 
- npm run start -- --worker-index 1 
+For exemple as a number of worker 4 the application will run with 4 different worker indexes, thus creating 4 different `csv` output files and storing the screenshots in 4 defferent folders : each output file and output folder named according to its worker index. 
 
-will run the application and scrap the second chunck of the input file 
+## Running application, usage example by this command: 
+For instance, in order to scrap all the metrics from an input file for a total `num-worker` = 4 configuration, we should run these commands :  
+```sh
+npm run start -- --worker-index 0 // to scrap the first chunck from the input file urls
+npm run start -- --worker-index 1 // to scrap the second chunck from the input file urls
+npm run start -- --worker-index 2 // to scrap the third chunck from the input file urls
+npm run start -- --worker-index 3 // to scrap the forth chunck from the input file urls 
+```
 
+## Configuration
 
-. Configuration
+- **--aws-s3-acces-key** : minio username 
+- **--aws-s3-secret-key** : minio user password
+- **--aws-s3-region** : `trans-fr-00`
+- **--aws-s3-input-path** : minio input csv file, exemple `s3://BUCKET_NAME/INPUT_FILE_NAME.csv.gz`
+- **--aws-s3-output-file-path** : minio output csv file with `.csv.gz` including the bucket name , exemple `s3://BUCKET_NAME/OUTPUT_FILE_NAME.csv.gz`
+- **--aws-s3-output-file-path-format** :  minio time configurable output csv file to take into account the iteration of scrapings with `.csv.gz` including the bucket name , exemple `s3://BUCKET_NAME/output/]YYYY-MM[/OUTPUT_FILE_NAME]`
 
-AWS_S3_ACCESS_KEY : minio username 
-AWS_S3_SECRET_KEY : minio user password
-AWS_S3_REGION : trans-fr-00
-AWS_S3_INPUT_PATH : minio input csv file, exemple s3://BUCKET_NAME/INPUT_FILE_NAME.csv.gz
-AWS_S3_OUTPUT_FILE_PATH : minio output csv file with .csv.gz including the bucket name , exemple s3://BUCKET_NAME/OUTPUT_FILE_NAME.csv.gz
-AWS_S3_OUTPUT_SCREENSHOTS_PATH : listing screenshots folder name including the bucket name , exemple s3://BUCKET_NAME/FOLDER_NAME.csv.gz
-AWS_S3_ENDPOINT : https://minio.pltp.us
+- **--aws-s3-output-screenshots-path** : listing screenshots folder name including the bucket name , exemple : `s3://BUCKET_NAME/FOLDER_NAME.csv.gz`
+- **--aws-s3-endpoint** : `https://minio.pltp.us`
 
-in the config.js file we can set the number of workers (4 by default)
+### In the `config.js` file we can set the number of workers (4 by default)

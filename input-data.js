@@ -1,14 +1,14 @@
 const s3Client = require('./s3-client');
 
-async function getInputChunks (inputUrls, numberChunks) {
-    const chunks = [];
-    while (inputUrls.length) {
-        const chunkSize = Math.ceil(inputUrls.length / numberChunks--);
-        const chunk = inputUrls.slice(0, chunkSize);
-        chunks.push(chunk);
-        inputUrls = inputUrls.slice(chunkSize);
-    };
-    return chunks;
+const getInputChunks = (inputUrls=[], numberChunks) => {
+   const chunks = [];
+   while(inputUrls.length) {
+      const chunkSize = Math.ceil(inputUrls.length/numberChunks--);
+      const chunk = inputUrls.slice(0, chunkSize);
+      chunks.push(chunk);
+      inputUrls = inputUrls.slice(chunkSize);
+   };
+   return chunks;
 };
 
 async function getInputData(options) {
@@ -17,8 +17,8 @@ async function getInputData(options) {
         Key: options.awsS3InputKey,
     }).promise();
     const allUrls = csvContent.Body.toString().split('\n').map(e => e.trim());
-    const result = await getInputChunks(allUrls, options.numWorkers);
-
+    const result = getInputChunks(allUrls, options.numWorkers);
     return result[options.workerIndex];
+
 }
 module.exports = getInputData;
