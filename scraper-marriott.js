@@ -1,9 +1,11 @@
 const getInputData = require('./input-data');
 const options = require('./config');
-const s3Client = require('./s3-client');
+const getS3Client = require('./s3-client');
 const Stream = require('stream');
 const { createGzip } = require('zlib');
 const csvWriteStream = require('csv-write-stream');
+
+const s3Client = getS3Client(options);
 
 const requestDataPaths = {
     _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',

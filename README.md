@@ -9,9 +9,9 @@ As the `puppeteer` library is hardly configurable and not always compatible with
 
 ## Characteristics
 
-Scraping rateshops by using service workers in order to run the module in parallely for several chuncks of input URLs. 
+Scraping rateshops by using worker processes in order to run the module in parallely for several chuncks of input URLs. 
 
-For exemple as a number of worker 4 the application will run with 4 different worker indexes, thus creating 4 different `csv` output files and storing the screenshots in 4 defferent folders : each output file and output folder named according to its worker index. 
+For exemple as a number of worker 4 the application will run with 4 different worker indexes, thus creating 4 different `csv` output files and storing the screenshots in 4 different folders : each output file and output folder named according to its worker index. 
 
 ## Running application, usage example by this command: 
 For instance, in order to scrap all the metrics from an input file for a total `num-worker` = 4 configuration, we should run these commands :  
@@ -29,9 +29,9 @@ npm run start -- --worker-index 3 // to scrap the forth chunck from the input fi
 - **--aws-s3-region** : `trans-fr-00`
 - **--aws-s3-input-path** : minio input csv file, exemple `s3://BUCKET_NAME/INPUT_FILE_NAME.csv.gz`
 - **--aws-s3-output-file-path** : minio output csv file with `.csv.gz` including the bucket name , exemple `s3://BUCKET_NAME/OUTPUT_FILE_NAME.csv.gz`
-- **--aws-s3-output-file-path-format** :  minio time configurable output csv file to take into account the iteration of scrapings with `.csv.gz` including the bucket name , exemple `s3://BUCKET_NAME/output/]YYYY-MM[/OUTPUT_FILE_NAME]`
+- **--aws-s3-output-file-path-format** :  <a href="https://momentjs.com/docs/#/parsing/string-format/">The time</a>   configurable output csv file to take into account the iteration of scrapings with `.csv.gz` including the bucket name , exemple `s3://BUCKET_NAME/output/]YYYY-MM[/OUTPUT_FILE_NAME]`
 
-- **--aws-s3-output-screenshots-path** : listing screenshots folder name including the bucket name , exemple : `s3://BUCKET_NAME/FOLDER_NAME.csv.gz`
+- **--aws-s3-output-screenshots-path** : listing screenshots folder name including the bucket name , exemple : `s3://BUCKET_NAME/FOLDER_NAME`
 - **--aws-s3-endpoint** : `https://minio.pltp.us`
 
 ### In the `config.js` file we can set the number of workers (4 by default)
