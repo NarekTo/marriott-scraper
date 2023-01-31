@@ -23,23 +23,36 @@ async function uploadScreenshot(newPage, screenshotNumber) {
     });
 
     await s3Client.upload({
-        Key: options.awsS3OutputScreenshotsKey + '/screenshot-' + screenshotNumber + '-of-worker-number-' + options.workerIndex + '.png',
+        Key: `${options.awsS3OutputScreenshotsKey}/screenshot-${screenshotNumber}-of-worker-number-${options.workerIndex}.png`,
         Bucket: options.awsS3OutputScreenshotsBucket,
         Body: screenshot
     }).promise()
 }
+
 async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
             const newPage = await browser.newPage();
 
+            const listingURL = await newPage.url();
             await newPage.setDefaultNavigationTimeout(100000);
             await newPage.goto(urls[chunckCounter]);
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
             await uploadScreenshot(newPage, chunckCounter);
 
-            const listingURL = await newPage.url();
+            // async function getTextContent (selector, defaultValue) {
+            //     return (await newPage.$(selector) !== null ? await newPage.$eval(selector, text => text.textContent) : defaultValue).promise();
+            // }
+            
+            // const check_in_date = await getTextContent(requestDataPaths._check_in_date, 'no check_in_date');
+            // const check_out_date = await getTextContent(requestDataPaths._check_out_date, 'no check_out_date');
+            // const price_per_night_brut = await getTextContent(requestDataPaths._price_per_night_brut, 'no price_per_night_brut');
+            // const security_deposit_brut = await getTextContent(requestDataPaths._security_deposit_brut, 'no security_deposit_brut');
+            // const cleaning_fee_brut = await getTextContent(requestDataPaths._cleaning_fee_brut, 'no cleaning_fee_brut');
+            // const taxes_fee_brut = await getTextContent(requestDataPaths._taxes_fee_brut, 'no taxes_fee_brut'); 
+            // const total_amount_brut = await getTextContent(requestDataPaths._total_amount_brut, 'no total_amount_brut');             
+            
             const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
             const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "no check_out_date";
             const price_per_night_brut = await newPage.$(requestDataPaths._price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths._price_per_night_brut, text => text.textContent) : "no price_per_night_brut";
@@ -51,64 +64,64 @@ async function getData(browser, urls, writeStream) {
             // checking different configurations 
             // 1) security deposit identification -------------------------------------------------------------------------------------------
 
-            if (security_deposit_brut.slice(0, 5) == 'Secur') {
+            if (security_deposit_brut.startsWith('Secur')) {
                 security_deposit = security_deposit_brut.slice(26,)
             }
-            else if (cleaning_fee_brut.slice(0, 5) == 'Secur') {
+            else if (cleaning_fee_brut.startsWith('Secur')) {
                 security_deposit = cleaning_fee_brut.slice(12,)
             }
-            else if (taxes_fee_brut.slice(0, 5) == 'Secur') {
+            else if (taxes_fee_brut.startsWith('Secur')) {
                 security_deposit = taxes_fee_brut.slice(5,)
             }
-            else if (total_amount_brut.slice(0, 5) == 'Secur') {
+            else if (total_amount_brut.startsWith('Secur')) {
                 security_deposit = total_amount_brut.slice(5,)
             }
             else {
                 security_deposit = 'no security deposit'
             }
             // 2) cleaning fee identification -------------------------------------------------------------------------------------------
-            if (security_deposit_brut.slice(0, 5) == 'Clean') {
+            if (security_deposit_brut.startsWith('Clean')) {
                 cleaning_fee = security_deposit_brut.slice(12,)
             }
-            else if (cleaning_fee_brut.slice(0, 5) == 'Clean') {
+            else if (cleaning_fee_brut.startsWith('Clean')) {
                 cleaning_fee = cleaning_fee_brut.slice(12,)
             }
-            else if (taxes_fee_brut.slice(0, 5) == 'Clean') {
+            else if (taxes_fee_brut.startsWith('Clean')) {
                 cleaning_fee = taxes_fee_brut.slice(12,)
             }
-            else if (total_amount_brut.slice(0, 5) == 'Clean') {
+            else if (total_amount_brut.startsWith('Clean')) {
                 cleaning_fee = total_amount_brut.slice(12,)
             }
             else {
                 cleaning_fee = 'no cleaning fee'
             }
             // 3) taxes fee identification -------------------------------------------------------------------------------------------
-            if (security_deposit_brut.slice(0, 5) == 'Taxes') {
+            if (security_deposit_brut.startsWith('Taxes')) {
                 taxes_fee = security_deposit_brut.slice(5,)
             }
-            else if (cleaning_fee_brut.slice(0, 5) == 'Taxes') {
+            else if (cleaning_fee_brut.startsWith('Taxes')) {
                 taxes_fee = cleaning_fee_brut.slice(5,)
             }
-            else if (taxes_fee_brut.slice(0, 5) == 'Taxes') {
+            else if (taxes_fee_brut.startsWith('Taxes')) {
                 taxes_fee = taxes_fee_brut.slice(5,)
             }
-            else if (total_amount_brut.slice(0, 5) == 'Taxes') {
+            else if (total_amount_brut.startsWith('Taxes')) {
                 taxes_fee = total_amount_brut.slice(5,)
             }
             else {
                 taxes_fee = 'no taxes fee'
             }
             // 4) total amount identification -------------------------------------------------------------------------------------------
-            if (security_deposit_brut.slice(0, 5) == 'Total') {
+            if (security_deposit_brut.startsWith('Total')) {
                 total_amount = security_deposit_brut.slice(5,)
             }
-            else if (cleaning_fee_brut.slice(0, 5) == 'Total') {
+            else if (cleaning_fee_brut.startsWith('Total')) {
                 total_amount = cleaning_fee_brut.slice(5,)
             }
-            else if (taxes_fee_brut.slice(0, 5) == 'Total') {
+            else if (taxes_fee_brut.startsWith('Total')) {
                 total_amount = taxes_fee_brut.slice(5,)
             }
-            else if (total_amount_brut.slice(0, 5) == 'Total') {
+            else if (total_amount_brut.startsWith('Total')) {
                 total_amount = total_amount_brut.slice(5,)
             }
             else {
