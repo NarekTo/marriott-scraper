@@ -33,28 +33,14 @@ async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
             const newPage = await browser.newPage();
-
             const listingURL = await newPage.url();
             await newPage.setDefaultNavigationTimeout(100000);
-            await newPage.goto(urls[chunckCounter]);
+            await newPage.goto(urls[chunckCounter], {waitUntil: "networkidle2"});
             await newPage.waitForSelector('#__next');
-            await newPage.$('#__next');
             await uploadScreenshot(newPage, chunckCounter);
-
-            // async function getTextContent (selector, defaultValue) {
-            //     return (await newPage.$(selector) !== null ? await newPage.$eval(selector, text => text.textContent) : defaultValue).promise();
-            // }
             
-            // const check_in_date = await getTextContent(requestDataPaths._check_in_date, 'no check_in_date');
-            // const check_out_date = await getTextContent(requestDataPaths._check_out_date, 'no check_out_date');
-            // const price_per_night_brut = await getTextContent(requestDataPaths._price_per_night_brut, 'no price_per_night_brut');
-            // const security_deposit_brut = await getTextContent(requestDataPaths._security_deposit_brut, 'no security_deposit_brut');
-            // const cleaning_fee_brut = await getTextContent(requestDataPaths._cleaning_fee_brut, 'no cleaning_fee_brut');
-            // const taxes_fee_brut = await getTextContent(requestDataPaths._taxes_fee_brut, 'no taxes_fee_brut'); 
-            // const total_amount_brut = await getTextContent(requestDataPaths._total_amount_brut, 'no total_amount_brut');             
-            
-            const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
-            const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "no check_out_date";
+            const check_in_date =  await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) ?? "no check_in_date";
+            const check_out_date = await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) ?? "no check_out_date";
             const price_per_night_brut = await newPage.$(requestDataPaths._price_per_night_brut) !== null ? await newPage.$eval(requestDataPaths._price_per_night_brut, text => text.textContent) : "no price_per_night_brut";
             const security_deposit_brut = await newPage.$(requestDataPaths._security_deposit_brut) !== null ? await newPage.$eval(requestDataPaths._security_deposit_brut, text => text.textContent) : "no security_deposit_brut";
             const cleaning_fee_brut = await newPage.$(requestDataPaths._cleaning_fee_brut) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee_brut, text => text.textContent) : "no cleaning_fee_brut";
@@ -129,7 +115,7 @@ async function getData(browser, urls, writeStream) {
             }
             const result =
             {
-                listingNumber: 'listing-' + chunckCounter + '-worker-index-' + options.workerIndex,
+                listingNumber: `listing-${chunckCounter}-worker-index-${options.workerIndex}`,
                 outputFile: options.awsS3OutputKey,
                 listingURL: listingURL,
                 check_in_date: check_in_date,
@@ -142,7 +128,7 @@ async function getData(browser, urls, writeStream) {
                 currency: total_amount.split(' ')[1]
             };
             writeStream.write(result)
-            console.log("the listing number: " + chunckCounter + " from the worker number: " + options.workerIndex + " was successfully scraped")
+            console.log(`the listing number: ${chunckCounter} from the worker number: ${options.workerIndex} was successfully scraped`)
             await newPage.close();
         }
         catch (error) {
