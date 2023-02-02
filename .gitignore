@@ -54,3 +54,7 @@ Thumbs.db
 # screenshots
 
 screenshot-*
+
+# .npmrc
+
+.npmrc
