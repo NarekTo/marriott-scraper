@@ -37,16 +37,16 @@ async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
             const newPage = await browser.newPage();
-            const listingURL = await newPage.url();
             await newPage.setDefaultNavigationTimeout(10000);
+            console.log(`The URL before opening is : `,urls[chunckCounter] ) 
             await newPage.goto(urls[chunckCounter], { waitUntil: "networkidle2" });
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
             await uploadScreenshot(newPage, chunckCounter);
 
-            const check_in_date = await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) ?? "no check_in_date";
-            const check_out_date = await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) ?? "no check_out_date";
-            const price_per_night_value = await newPage.$eval(requestDataPaths._price_per_night_value, text => text.textContent) ?? "no price_per_night_value";
+            const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
+            const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "no check_out_date";
+            const price_per_night_value = await newPage.$(requestDataPaths._price_per_night_value) !== null ? await newPage.$eval(requestDataPaths._price_per_night_value, text => text.textContent) : "no price_per_night_value";
             const security_deposit_value = await newPage.$(requestDataPaths._security_deposit_value) !== null ? await newPage.$eval(requestDataPaths._security_deposit_value, text => text.textContent) : "no security_deposit_value";
             const security_deposit_label = await newPage.$(requestDataPaths._security_deposit_label) !== null ? await newPage.$eval(requestDataPaths._security_deposit_label, text => text.textContent) : "no security_deposit_label";
             const cleaning_fee_value = await newPage.$(requestDataPaths._cleaning_fee_value) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee_value, text => text.textContent) : "no cleaning_fee_value";
@@ -126,7 +126,7 @@ async function getData(browser, urls, writeStream) {
             {
                 listingNumber: `listing-${chunckCounter}-worker-index-${options.workerIndex}`,
                 outputFile: options.awsS3OutputKey,
-                listingURL: listingURL,
+                listingURL: urls[chunckCounter],
                 check_in_date: check_in_date,
                 check_out_date: check_out_date,
                 price_per_night: price_per_night_value.split(' ')[0],
@@ -136,7 +136,7 @@ async function getData(browser, urls, writeStream) {
                 total_amount: total_amount.split(' ')[0],
                 currency: total_amount.split(' ')[1]
             };
-
+            
             writeStream.write(result)
             console.log(`the listing number: ${chunckCounter} from the worker number: ${options.workerIndex} was successfully scraped`)
             await newPage.close();
