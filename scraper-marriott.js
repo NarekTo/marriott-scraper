@@ -137,6 +137,9 @@ async function getData(browser, urls, writeStream) {
                 currency: total_amount.split(' ')[1]
             };
             
+            console.log(`The URL after scraping the result`,urls[chunckCounter] ) 
+            console.log(`result`,result ) 
+
             writeStream.write(result)
             console.log(`the listing number: ${chunckCounter} from the worker number: ${options.workerIndex} was successfully scraped`)
             await newPage.close();
