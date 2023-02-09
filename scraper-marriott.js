@@ -32,7 +32,6 @@ async function uploadScreenshot(newPage, screenshotNumber) {
         Body: screenshot
     }).promise()
 }
-
 async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
@@ -136,9 +135,6 @@ async function getData(browser, urls, writeStream) {
                 total_amount: total_amount.split(' ')[0],
                 currency: total_amount.split(' ')[1]
             };
-            
-            console.log(`The URL after scraping the result`,urls[chunckCounter] ) 
-            console.log(`result`,result ) 
 
             writeStream.write(result)
             console.log(`the listing number: ${chunckCounter} from the worker number: ${options.workerIndex} was successfully scraped`)

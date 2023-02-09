@@ -51,6 +51,11 @@ const cliArguments = [
         description: 'folder where the screenshots will be uploaded while scraping the listings',
     },
     {
+        name: 'aws-s3-output-screenshots-path-format',
+        type: String,
+        description: '(optional) Full S3 URI of the .csv.gz file where the file will be written, formatted with a moment.js format',
+    },
+    {
         name: 'aws-s3-output-screenshots-bucket',
         type: String,
         description: '(optional) Full S3 URI of the screenshots where the file will be written',
@@ -94,7 +99,8 @@ function parseOptions(rawOptions) {
     const awsS3InputFilePath = rawOptions['aws-s3-input-path'];
     let awsS3OutputFilePath = '';
     const awsS3OutputFilePathFormat = rawOptions['aws-s3-output-path-file-format'];
-    const awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
+    let awsS3OutputScreenshotsPath = '';
+    const awsS3OutputScreenshotsPathFormat = rawOptions['aws-s3-output-screenshots-path-format'];
     const numWorkers = rawOptions['num-workers'];
     const workerIndex = rawOptions['worker-index'];
     const awsS3Endpoint = rawOptions['aws-s3-endpoint'];
@@ -113,6 +119,16 @@ function parseOptions(rawOptions) {
         awsS3OutputFilePath = mDate.format(rawOptions['aws-s3-output-file-path-format']);
     };
 
+    if (rawOptions['aws-s3-output-screenshots-path']) {
+        assert(!rawOptions['aws-s3-output-screenshots-path-format'], 'You must not set both --aws-s3-output-screenshots-path and --aws-s3-output-screenshots-path-format');
+        awsS3OutputScreenshotsPath = rawOptions['aws-s3-output-screenshots-path'];
+    } else {
+        assert(rawOptions['aws-s3-output-screenshots-path-format'], 'You must set either --aws-s3-output-screenshots-path or --aws-s3-output-screenshots-path-format');
+        const mDate = historicSupplyMonth ? moment.utc(`${historicSupplyMonth}-01`) : moment.utc();
+        awsS3OutputScreenshotsPath = mDate.format(rawOptions['aws-s3-output-screenshots-path-format']);
+    };
+
+
     assert(rawOptions['aws-s3-input-path'], 'aws-s3-input-path should be set');
 
     const partsInput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(rawOptions['aws-s3-input-path']);
@@ -125,9 +141,15 @@ function parseOptions(rawOptions) {
 
     assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
     awsS3OutputBucket = partsOutput[1];
-    awsS3OutputKey = numWorkers > 1 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
+    awsS3OutputKey = numWorkers > 0 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
 
     const partsOutputScreenshots = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+)/.exec(awsS3OutputScreenshotsPath);
+
+    assert(partsOutputScreenshots && partsOutputScreenshots.length === 3, '--aws-s3-output-screenshots-path should be a valid folder');
+    awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
+    awsS3OutputScreenshotsKey = numWorkers > 0 ? `${partsOutputScreenshots[2]}.worker-${workerIndex}.csv.gz` : null;
+
+
     awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
     awsS3OutputScreenshotsKey = partsOutputScreenshots[2];
 
@@ -145,6 +167,9 @@ function parseOptions(rawOptions) {
         awsS3OutputFilePath,
         awsS3OutputFilePath,
         awsS3OutputFilePathFormat,
+        awsS3OutputFilePathFormat,
+        awsS3OutputScreenshotsPath,
+        awsS3OutputScreenshotsPathFormat,
         numWorkers,
         workerIndex,
         awsS3Endpoint,
