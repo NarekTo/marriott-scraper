@@ -108,7 +108,7 @@ function parseOptions(rawOptions) {
     assert(rawOptions['aws-s3-access-key'], '--aws-s3-access-key is required');
     assert(rawOptions['aws-s3-secret-key'], '--aws-s3-secret-key is required');
 
-    const historicSupplyMonth = moment.utc().startOf('month').subtract(1, 'month').format('YYYY-MM');
+    const historicSupplyMonth = moment.utc().startOf('month').format('YYYY-MM');
 
     if (rawOptions['aws-s3-output-file-path']) {
         assert(!rawOptions['aws-s3-output-file-path-format'], 'You must not set both --aws-s3-output-file-path and --aws-s3-output-file-path-format');
