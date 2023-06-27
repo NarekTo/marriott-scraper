@@ -69,7 +69,7 @@ const cliArguments = [
         name: 'num-workers',
         type: Number,
         description: 'Number of concurrent processes that will run the export',
-        defaultValue: 1,
+        defaultValue: 4,
     },
     {
         name: 'worker-index',
@@ -78,6 +78,21 @@ const cliArguments = [
             'Having multiple workers (num-workers greater than 1), ' +
             'worker-index identify this worker as index in workers array',
         defaultValue: 0,
+    },
+    {
+        name: 'proxy-hosts',
+        type: String,
+        description: 'Proxy server'
+    },
+    {
+        name: 'proxy-username',
+        type: String,
+        description: 'Proxy username'
+    },
+    {
+        name: 'proxy-password',
+        type: String,
+        description: 'Proxy password'
     }
 ];
 

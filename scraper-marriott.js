@@ -34,7 +34,8 @@ async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
             const newPage = await browser.newPage();
-            await newPage.setDefaultNavigationTimeout(10000);
+            await newPage.setDefaultNavigationTimeout(30000);
+            await newPage.authenticate({ username: 'brd-customer-hl_a4a9d04a-zone-zone1', password: 'nqs47xpyb7rm' });
             console.log(`The URL before opening is : `, urls[chunckCounter])
             await newPage.goto(urls[chunckCounter], { waitUntil: "networkidle2" });
             await newPage.waitForSelector('#__next');
@@ -50,6 +51,28 @@ async function getData(browser, urls, writeStream) {
             const cleaning_fee = await newPage.$(requestDataPaths._cleaning_fee) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee, text => text.textContent) : "no cleaning_fee_value";
             const taxes_fee = await newPage.$(requestDataPaths._taxes_fee) !== null ? await newPage.$eval(requestDataPaths._taxes_fee, text => text.textContent) : "no taxes_fee_value";
             const total_amount = await newPage.$(requestDataPaths._total_amount) !== null ? await newPage.$eval(requestDataPaths._total_amount, text => text.textContent) : "no total_amount_value";
+
+            // const url_brut = await newPage.$('head > meta:nth-child(15)') !== null ? await newPage.$eval('head > meta:nth-child(15)', text => text.href) : "no url_brut";
+
+            // const url_brut = await newPage.$eval(() => {
+            //     const linkElement = document.querySelector("head > link:nth-child(15)"); // Replace the selector with your desired query
+            //     return linkElement.getAttribute('href'); // Replace 'href' with the attribute you want to scrape
+            // });
+
+            // console.log("url_brut: ", url_brut)
+
+
+            console.log("check_in_date: ", check_in_date)
+            console.log("check_out_date: ", check_out_date)
+            console.log("price_per_night: ", price_per_night)
+            console.log("price_per_night_value: ", price_per_night_value)
+            console.log("discount: ", discount)
+            console.log("security_deposit: ", security_deposit)
+            console.log("cleaning_fee: ", cleaning_fee)
+            console.log("taxes_fee: ", taxes_fee)
+            console.log("total_amount: ", total_amount)
+
+
 
             const result =
             {
