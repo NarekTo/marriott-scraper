@@ -35,7 +35,7 @@ async function getData(browser, urls, writeStream) {
             if (!urls[chunckCounter]) break;
             console.log(`The URL before opening is : `, urls[chunckCounter])
             const newPage = await browser.newPage();
-            await newPage.setDefaultNavigationTimeout(30000);
+            await newPage.setDefaultNavigationTimeout(60000);
             if (options.proxyPassword && options.proxyUsername) {
                 await newPage.authenticate({ username: options.proxyUsername, password: options.proxyPassword });
             }
