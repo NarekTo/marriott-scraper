@@ -78,6 +78,21 @@ const cliArguments = [
             'Having multiple workers (num-workers greater than 1), ' +
             'worker-index identify this worker as index in workers array',
         defaultValue: 0,
+    },
+    {
+        name: 'proxy-hosts',
+        type: String,
+        description: 'Proxy server'
+    },
+    {
+        name: 'proxy-username',
+        type: String,
+        description: 'Proxy username'
+    },
+    {
+        name: 'proxy-password',
+        type: String,
+        description: 'Proxy password'
     }
 ];
 
@@ -104,6 +119,9 @@ function parseOptions(rawOptions) {
     const numWorkers = rawOptions['num-workers'];
     const workerIndex = rawOptions['worker-index'];
     const awsS3Endpoint = rawOptions['aws-s3-endpoint'];
+    const proxyHosts = rawOptions['proxy-hosts'];
+    const proxyUsername = rawOptions['proxy-username'];
+    const proxyPassword = rawOptions['proxy-password'];
 
     assert(rawOptions['aws-s3-access-key'], '--aws-s3-access-key is required');
     assert(rawOptions['aws-s3-secret-key'], '--aws-s3-secret-key is required');
@@ -173,6 +191,9 @@ function parseOptions(rawOptions) {
         numWorkers,
         workerIndex,
         awsS3Endpoint,
+        proxyHosts,
+        proxyUsername,
+        proxyPassword,
     }
     return options;
 }

@@ -6,7 +6,7 @@
   "dependencies": {
     "@trans/config": "^0.5.2",
     "assert": "^2.0.0",
-    "aws-sdk": "^2.1297.0",
+    "aws-sdk": "^2.1404.0",
     "cheerio": "^1.0.0-rc.11",
     "chrome": "^0.1.0",
     "chrome-launcher": "^0.15.1",
@@ -21,7 +21,7 @@
     "get-csv": "^1.0.1",
     "locate-chrome": "^0.1.1",
     "moment": "^2.29.4",
-    "puppeteer": "^19.6.0",
+    "puppeteer": "^19.11.1",
     "stream": "^0.0.2",
     "util": "^0.12.5",
     "zlib": "^1.0.5"

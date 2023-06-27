@@ -1,7 +1,12 @@
 ## Marriott luxury homes rateshops scraper from https://homes-and-villas.marriott.com/  platform
 
-
-This module is automatically and dynamically receiving input listing urls from the `minio` server, which has been previously uploaded to the `minio` server as a `csv` file.
+This repository contains the script that receives input listing urls from a `MinIo` address, on CSV fomat. Example:
+```
+https://homes-and-villas.marriott.com/en/properties/40172095?start_date=2023-10-09&number_of_guests=1&nights=4&showPriceInHomeCurrency=false&currency=USD5&showPriceInHomeCurrency=false&currency=USD
+https://homes-and-villas.marriott.com/en/properties/40172121?start_date=2023-10-09&number_of_guests=1&nights=4&showPriceInHomeCurrency=false&currency=USD5&showPriceInHomeCurrency=false&currency=USD
+https://homes-and-villas.marriott.com/en/properties/40172139?start_date=2023-10-09&number_of_guests=1&nights=4&showPriceInHomeCurrency=false&currency=USD5&showPriceInHomeCurrency=false&currency=USD
+https://homes-and-villas.marriott.com/en/properties/40068457?start_date=2023-10-09&number_of_guests=1&nights=4&showPriceInHomeCurrency=false&currency=USD5&showPriceInHomeCurrency=false&currency=USD
+```
 
 Then by scraping the rateshops and registring the screenshot of each listing, it is storing in the `minio` server as a `csv` file : `csv` for the metrics and `png` for the screenshots images.
 
