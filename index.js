@@ -4,6 +4,7 @@ const options = require('./config');
 
 scraper(browserObject.startBrowser(options))
     .then(() => {
+        console.log('DONE');
         process.exit(0);
     })
     .catch((err) => {
