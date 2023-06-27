@@ -1,17 +1,19 @@
 const puppeteer = require('puppeteer');
-const proxyUrl = `brd.superproxy.io:22225`;
 
-async function startBrowser() {
+async function startBrowser(options) {
 	let browser;
+	const args = [
+		`--no-sandbox`,
+		`--disable-setuid-sandbox`,
+	];
+	if (options.proxyHosts) {
+		console.log('Using proxy', options.proxyHosts);
+		args.push(`--proxy-server=${options.proxyHosts}`);
+	}
 	try {
 		browser = await puppeteer.launch({
+			args,
 			headless: true,
-			args: [
-				`--proxy-server=${proxyUrl}`,
-				`--no-sandbox`,
-				`--disable-setuid-sandbox`,
-			]
-
 		});
 	} catch (err) {
 		throw err

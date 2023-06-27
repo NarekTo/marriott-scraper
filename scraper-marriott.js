@@ -10,7 +10,6 @@ const s3Client = getS3Client(options);
 const requestDataPaths = {
     _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',
     _check_out_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div> div > div> div > div > div > div:nth-child(4)> span > div:nth-child(2)',
-    _price_per_night_value: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div > div > div> div > div> div > div > div> span:nth-child(1)> span',
     _price_per_night: '[data-locator="nightly-rate-label"]',
     _discount: '[data-locator="discount-price-amount"]',
     _security_deposit: '[data-locator="security-deposit-amount"]',
@@ -33,46 +32,26 @@ async function uploadScreenshot(newPage, screenshotNumber) {
 async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         try {
+            if (!urls[chunckCounter]) break;
+            console.log(`The URL before opening is : `, urls[chunckCounter])
             const newPage = await browser.newPage();
             await newPage.setDefaultNavigationTimeout(30000);
-            await newPage.authenticate({ username: 'brd-customer-hl_a4a9d04a-zone-zone1', password: 'nqs47xpyb7rm' });
-            console.log(`The URL before opening is : `, urls[chunckCounter])
+            if (options.proxyPassword && options.proxyUsername) {
+                await newPage.authenticate({ username: options.proxyUsername, password: options.proxyPassword });
+            }
             await newPage.goto(urls[chunckCounter], { waitUntil: "networkidle2" });
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
             await uploadScreenshot(newPage, chunckCounter);
 
-            const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "no check_in_date";
-            const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "no check_out_date";
-            const price_per_night = await newPage.$(requestDataPaths._price_per_night) !== null ? await newPage.$eval(requestDataPaths._price_per_night, text => text.textContent) : "no price_per_night_value";
-            const price_per_night_value = await newPage.$(requestDataPaths._price_per_night_value) !== null ? await newPage.$eval(requestDataPaths._price_per_night_value, text => text.textContent) : "no price_per_night_value";
-            const discount = await newPage.$(requestDataPaths._discount) !== null ? await newPage.$eval(requestDataPaths._discount, text => text.textContent) : "no discount_value";
-            const security_deposit = await newPage.$(requestDataPaths._security_deposit) !== null ? await newPage.$eval(requestDataPaths._security_deposit, text => text.textContent) : "no security_deposit_value";
-            const cleaning_fee = await newPage.$(requestDataPaths._cleaning_fee) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee, text => text.textContent) : "no cleaning_fee_value";
-            const taxes_fee = await newPage.$(requestDataPaths._taxes_fee) !== null ? await newPage.$eval(requestDataPaths._taxes_fee, text => text.textContent) : "no taxes_fee_value";
-            const total_amount = await newPage.$(requestDataPaths._total_amount) !== null ? await newPage.$eval(requestDataPaths._total_amount, text => text.textContent) : "no total_amount_value";
-
-            // const url_brut = await newPage.$('head > meta:nth-child(15)') !== null ? await newPage.$eval('head > meta:nth-child(15)', text => text.href) : "no url_brut";
-
-            // const url_brut = await newPage.$eval(() => {
-            //     const linkElement = document.querySelector("head > link:nth-child(15)"); // Replace the selector with your desired query
-            //     return linkElement.getAttribute('href'); // Replace 'href' with the attribute you want to scrape
-            // });
-
-            // console.log("url_brut: ", url_brut)
-
-
-            console.log("check_in_date: ", check_in_date)
-            console.log("check_out_date: ", check_out_date)
-            console.log("price_per_night: ", price_per_night)
-            console.log("price_per_night_value: ", price_per_night_value)
-            console.log("discount: ", discount)
-            console.log("security_deposit: ", security_deposit)
-            console.log("cleaning_fee: ", cleaning_fee)
-            console.log("taxes_fee: ", taxes_fee)
-            console.log("total_amount: ", total_amount)
-
-
+            const check_in_date = await newPage.$(requestDataPaths._check_in_date) !== null ? await newPage.$eval(requestDataPaths._check_in_date, text => text.textContent) : "NA";
+            const check_out_date = await newPage.$(requestDataPaths._check_out_date) !== null ? await newPage.$eval(requestDataPaths._check_out_date, text => text.textContent) : "NA";
+            const price_per_night = await newPage.$(requestDataPaths._price_per_night) !== null ? await newPage.$eval(requestDataPaths._price_per_night, text => text.textContent) : "NA";
+            const discount = await newPage.$(requestDataPaths._discount) !== null ? await newPage.$eval(requestDataPaths._discount, text => text.textContent) : "NA";
+            const security_deposit = await newPage.$(requestDataPaths._security_deposit) !== null ? await newPage.$eval(requestDataPaths._security_deposit, text => text.textContent) : "NA";
+            const cleaning_fee = await newPage.$(requestDataPaths._cleaning_fee) !== null ? await newPage.$eval(requestDataPaths._cleaning_fee, text => text.textContent) : "NA";
+            const taxes_fee = await newPage.$(requestDataPaths._taxes_fee) !== null ? await newPage.$eval(requestDataPaths._taxes_fee, text => text.textContent) : "NA";
+            const total_amount = await newPage.$(requestDataPaths._total_amount) !== null ? await newPage.$eval(requestDataPaths._total_amount, text => text.textContent) : "NA";
 
             const result =
             {
@@ -81,9 +60,9 @@ async function getData(browser, urls, writeStream) {
                 listingURL: urls[chunckCounter],
                 check_in_date: check_in_date,
                 check_out_date: check_out_date,
-                price_per_night: price_per_night.split(' ')[0],
-                price_per_night_value:price_per_night_value.split(' ')[0],
-                discount: discount.split('')[0],
+                price_per_night_value: price_per_night.split(' ')[0],
+                price_per_night_label: price_per_night,
+                discount: discount.split(' ')[0],
                 security_deposit: security_deposit.split(' ')[0],
                 cleaning_fee: cleaning_fee.split(' ')[0],
                 taxes_fee: taxes_fee.split(' ')[0],
