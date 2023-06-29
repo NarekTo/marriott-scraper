@@ -8,14 +8,26 @@ const csvWriteStream = require('csv-write-stream');
 const s3Client = getS3Client(options);
 
 const requestDataPaths = {
-    _check_in_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div > div > div > div > div > div> div:nth-child(1)  > span > div:nth-child(2)',
-    _check_out_date: '#pdp-103-bleed-0-pdphomesummary > div > div > div > div > div:nth-child(2) > div> div:nth-child(1) > div > div > div > div> div > div> div > div > div > div:nth-child(4)> span > div:nth-child(2)',
+    _check_in_date: '.InputStartDate div:nth-child(2)',
+    _check_out_date: '.InputEndDate div:nth-child(2)',
     _price_per_night: '[data-locator="nightly-rate-label"]',
     _discount: '[data-locator="discount-price-amount"]',
     _security_deposit: '[data-locator="security-deposit-amount"]',
     _cleaning_fee: '[data-locator="cleaning-fee-amount"]',
     _taxes_fee: '[data-locator="tax-fee-amount"]',
     _total_amount: '[data-locator="data-labels-currency-symbol-quote-total"]',
+}
+
+async function retry(promiseFactory, retryCount) {
+    try {
+        return await promiseFactory();
+    } catch (error) {
+        if (retryCount <= 0) {
+            throw error;
+        }
+        console.error(`[ERROR]: Request error ${error}. Retrying...`);
+        return await retry(promiseFactory, retryCount - 1);
+    }
 }
 
 async function uploadScreenshot(newPage, screenshotNumber) {
@@ -29,17 +41,23 @@ async function uploadScreenshot(newPage, screenshotNumber) {
     }).promise()
 }
 
+let listingsWithTimeoutErrors = 0;
+let successfullyScrapedListings = 0;
+
 async function getData(browser, urls, writeStream) {
     for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
+        const url = urls[chunckCounter];
         try {
-            if (!urls[chunckCounter]) break;
-            console.log(`The URL before opening is : `, urls[chunckCounter])
+            if (!url) break;
+            console.log('[INFO] Scraping rateshops from URL:', url);
             const newPage = await browser.newPage();
             await newPage.setDefaultNavigationTimeout(60000);
             if (options.proxyPassword && options.proxyUsername) {
                 await newPage.authenticate({ username: options.proxyUsername, password: options.proxyPassword });
             }
-            await newPage.goto(urls[chunckCounter], { waitUntil: "networkidle2" });
+            // We're retrying this because most timeout errors are due to proxy overload
+            await retry(() => newPage.goto(urls[chunckCounter], { waitUntil: "networkidle2" }));
+            // TODO: check why this is here
             await newPage.waitForSelector('#__next');
             await newPage.$('#__next');
             await uploadScreenshot(newPage, chunckCounter);
@@ -71,12 +89,17 @@ async function getData(browser, urls, writeStream) {
             };
 
             writeStream.write(result)
-            console.log(`the listing number: ${chunckCounter} from the worker number: ${options.workerIndex} was successfully scraped`)
+            successfullyScrapedListings++;
+            console.log(`[INFO] Listing ${url} has been successfully scraped`);
             await newPage.close();
         }
         catch (error) {
-            console.error(error);
-            throw error
+            if (error.message.match(/timeout/i)) {
+                listingsWithTimeoutErrors++;
+                console.warn(`[WARNING] Listing ${url} gave a TimeoutError`);
+            } else {
+                throw error;
+            }
         }
     }
 }
@@ -109,7 +132,10 @@ async function scrapeAll(browserInstance) {
         throw error;
     }
     finally {
+        console.log(`[INFO] Number of listings successfully scraped: ${successfullyScrapedListings}`);
+        console.log(`[INFO] Number of listings with TimeoutError: ${listingsWithTimeoutErrors}`);
         await browser.close();
     }
 }
+
 module.exports = (browserInstance) => scrapeAll(browserInstance)
