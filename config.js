@@ -1,6 +1,5 @@
 const config = require('@trans/config');
 const moment = require('moment');
-const AWS = require('aws-sdk');
 const assert = require('assert');
 
 config.env.load();
@@ -135,7 +134,7 @@ function parseOptions(rawOptions) {
         assert(rawOptions['aws-s3-output-file-path-format'], 'You must set either --aws-s3-output-file-path or --aws-s3-output-file-path-format');
         const mDate = historicSupplyMonth ? moment.utc(`${historicSupplyMonth}-01`) : moment.utc();
         awsS3OutputFilePath = mDate.format(rawOptions['aws-s3-output-file-path-format']);
-    };
+    }
 
     if (rawOptions['aws-s3-output-screenshots-path']) {
         assert(!rawOptions['aws-s3-output-screenshots-path-format'], 'You must not set both --aws-s3-output-screenshots-path and --aws-s3-output-screenshots-path-format');
@@ -144,7 +143,7 @@ function parseOptions(rawOptions) {
         assert(rawOptions['aws-s3-output-screenshots-path-format'], 'You must set either --aws-s3-output-screenshots-path or --aws-s3-output-screenshots-path-format');
         const mDate = historicSupplyMonth ? moment.utc(`${historicSupplyMonth}-01`) : moment.utc();
         awsS3OutputScreenshotsPath = mDate.format(rawOptions['aws-s3-output-screenshots-path-format']);
-    };
+    }
 
 
     assert(rawOptions['aws-s3-input-path'], 'aws-s3-input-path should be set');
@@ -183,8 +182,6 @@ function parseOptions(rawOptions) {
         awsS3OutputScreenshotsKey,
         awsS3InputFilePath,
         awsS3OutputFilePath,
-        awsS3OutputFilePath,
-        awsS3OutputFilePathFormat,
         awsS3OutputFilePathFormat,
         awsS3OutputScreenshotsPath,
         awsS3OutputScreenshotsPathFormat,

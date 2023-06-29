@@ -1,0 +1,52 @@
+---
+kind: pipeline
+name: default
+type: docker
+image_pull_secrets:
+- private_registry
+- dockerconfigjson
+
+clone:
+  disable: true
+
+steps:
+- name: git
+  image: plugins/git
+  settings:
+    depth: 1
+
+- name: build_image
+  image: plugins/docker
+  settings:
+    repo: seetransparent/rates-shops-marriott
+    tags: ${DRONE_COMMIT_SHA}
+    network_mode: host
+    build_args_from_env:
+    - BOT_SSH_KEY
+    - NPM_RC
+    - NPM_TOKEN
+  environment:
+    DOCKER_USERNAME:
+      from_secret: docker_username
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    BOT_SSH_KEY:
+      from_secret: bot_ssh_key
+    NPM_RC:
+      from_secret: npm_rc
+    NPM_TOKEN:
+      from_secret: npm_token
+- name: lint
+  image: seetransparent/rates-shops-marriott:${DRONE_COMMIT_SHA}
+  commands:
+  - cd /app
+  - npm run lint
+  environment:
+    DOCKER_USERNAME:
+      from_secret: docker_username
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    NODE_ENV:
+      from_secret: node_env
+    NPM_TOKEN:
+      from_secret: npm_token

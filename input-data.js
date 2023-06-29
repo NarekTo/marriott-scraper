@@ -7,7 +7,7 @@ const getInputChunks = (inputUrls = [], numberChunks) => {
         const chunk = inputUrls.slice(0, chunkSize);
         chunks.push(chunk);
         inputUrls = inputUrls.slice(chunkSize);
-    };
+    }
     return chunks;
 };
 

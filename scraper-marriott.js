@@ -31,9 +31,7 @@ async function retry(promiseFactory, retryCount) {
 }
 
 async function uploadScreenshot(newPage, screenshotNumber) {
-    screenshot = await newPage.screenshot({
-        fullPage: true
-    });
+    const screenshot = await newPage.screenshot({ fullPage: true });
     await s3Client.upload({
         Key: `${options.awsS3OutputScreenshotsKey}/screenshot-${screenshotNumber}-of-worker-number-${options.workerIndex}.png`,
         Bucket: options.awsS3OutputScreenshotsBucket,
@@ -45,7 +43,7 @@ let listingsWithTimeoutErrors = 0;
 let successfullyScrapedListings = 0;
 
 async function getData(browser, urls, writeStream) {
-    for (chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
+    for (let chunckCounter = 0; chunckCounter < urls.length; chunckCounter++) {
         const url = urls[chunckCounter];
         try {
             if (!url) break;

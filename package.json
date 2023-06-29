@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@trans/config": "^0.5.2",
+    "@typescript-eslint/parser": "^5.60.1",
     "assert": "^2.0.0",
     "aws-sdk": "^2.1404.0",
     "cheerio": "^1.0.0-rc.11",
@@ -19,6 +20,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint '**/*.js'",
     "start": "node index.js"
   },
   "repository": {
@@ -32,6 +34,7 @@
   },
   "homepage": "https://bitbucket.org/seetransparent/marriott-homes-and-villas#readme",
   "devDependencies": {
+    "eslint": "^8.43.0",
     "parcel-plugin-externals": "^0.5.2"
   }
 }
