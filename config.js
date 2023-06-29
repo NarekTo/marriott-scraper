@@ -103,12 +103,6 @@ const rawOptions = config.env.getArguments(cliArguments, process.argv, {
 function parseOptions(rawOptions) {
     const awsS3AccessKey = rawOptions['aws-s3-access-key'];
     const awsS3SecretKey = rawOptions['aws-s3-secret-key'];
-    let awsS3InputBucket = '';
-    let awsS3InputKey = '';
-    let awsS3OutputBucket = '';
-    let awsS3OutputKey = '';
-    let awsS3OutputScreenshotsBucket = '';
-    let awsS3OutputScreenshotsKey = '';
     const awsS3Region = rawOptions['aws-s3-region'];
     const awsS3InputFilePath = rawOptions['aws-s3-input-path'];
     let awsS3OutputFilePath = '';
@@ -150,25 +144,21 @@ function parseOptions(rawOptions) {
 
     const partsInput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv)$/.exec(rawOptions['aws-s3-input-path']);
 
-    assert(partsInput && partsInput.length === 3, '--aws-s3-input-path should be a valid S3 location for a .csv file');
-    awsS3InputBucket = partsInput[1];
-    awsS3InputKey = partsInput[2];
+    assert(partsInput && partsInput.length === 3, '--aws-s3-input-path should be a valid S3 location for a .csv file: s3://bucket/folder/input.csv');
+    const awsS3InputBucket = partsInput[1];
+    const awsS3InputKey = partsInput[2];
 
     const partsOutput = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+\.csv\.gz)$/.exec(awsS3OutputFilePath);
 
-    assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv file');
-    awsS3OutputBucket = partsOutput[1];
-    awsS3OutputKey = numWorkers > 0 ? `${partsOutput[2]}.worker-${workerIndex}.csv.gz` : null;
+    assert(partsOutput && partsOutput.length === 3, '--aws-s3-output-path should be a valid S3 location for a .csv.gz file: s3://bucket/folder/file.csv.gz');
+    const awsS3OutputBucket = partsOutput[1];
+    const awsS3OutputKey = numWorkers > 0 ? `${partsOutput[2].split('.csv.gz')[0]}.worker-${workerIndex}.csv.gz` : null;
 
     const partsOutputScreenshots = /^s3:\/\/([^\/]+)\/((?:[^\/]+\/)*[^\/]+)/.exec(awsS3OutputScreenshotsPath);
 
-    assert(partsOutputScreenshots && partsOutputScreenshots.length === 3, '--aws-s3-output-screenshots-path should be a valid folder');
-    awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
-    awsS3OutputScreenshotsKey = numWorkers > 0 ? `${partsOutputScreenshots[2]}.worker-${workerIndex}.csv.gz` : null;
-
-
-    awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
-    awsS3OutputScreenshotsKey = partsOutputScreenshots[2];
+    assert(partsOutputScreenshots && partsOutputScreenshots.length === 3, '--aws-s3-output-screenshots-path should be a valid folder: s3://bucket/folder/');
+    const awsS3OutputScreenshotsBucket = partsOutputScreenshots[1];
+    const awsS3OutputScreenshotsKey = numWorkers > 0 ? `${partsOutputScreenshots[2]}` : null;
 
     const options = {
         awsS3AccessKey,

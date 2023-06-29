@@ -92,6 +92,7 @@ async function getData(browser, urls, writeStream) {
             await newPage.close();
         }
         catch (error) {
+            console.log('Error message', error.message);
             if (error.message.match(/timeout/i)) {
                 listingsWithTimeoutErrors++;
                 console.warn(`[WARNING] Listing ${url} gave a TimeoutError`);
